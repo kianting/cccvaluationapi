@@ -43,6 +43,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/jibx/config/3rdparty/org/eclipse/org.eclipse.text/3.5.100.v20110505-0800/org.eclipse.text-3.5.100.v20110505-0800.jar" sourcepath="M2_REPO/org/jibx/config/3rdparty/org/eclipse/org.eclipse.text/3.5.100.v20110505-0800/org.eclipse.text-3.5.100.v20110505-0800-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/thoughtworks/qdox/qdox/1.12.1/qdox-1.12.1.jar" sourcepath="M2_REPO/com/thoughtworks/qdox/qdox/1.12.1/qdox-1.12.1-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/regexp/regexp/1.2/regexp-1.2.jar"/>
-	<classpathentry kind="lib" path="C:/Data/99_Software/SQLServerJava/sqljdbc_4.2/enu/jre8/sqljdbc42.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/sqljdbc42.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -1,7 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.8.3"
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8082" doc:name="HTTP Listener Configuration"/>
+    <flow name="implementationFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/testStoreProc" allowedMethods="GET" doc:name="HTTP"/>
+        <db:stored-procedure config-ref="Generic_Database_Configuration" doc:name="Copy_of_Database">
+            <db:parameterized-query><![CDATA[USE [OpenDataHub]
+GO
+
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[property_sales_s]
+		@latitude = NULL,
+		@longitude = NULL,
+		@radius_in_meters = 50000,
+		@start_date = '2014-01-01',
+		@end_date = '2017-04-12',
+		@min_price = 100000,
+		@max_price = 100000000
+
+SELECT	'Return Value' = @return_value
+
+GO]]></db:parameterized-query>
+        </db:stored-procedure>
+    </flow>
+</mule>

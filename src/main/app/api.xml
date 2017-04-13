@@ -28,10 +28,29 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
         <dw:transform-message doc:name="Build Query">
             <dw:set-payload resource="classpath:ReadCollection.dwl"/>
         </dw:transform-message>
-        <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
         <db:stored-procedure config-ref="Generic_Database_Configuration" doc:name="Database">
-            <db:parameterized-query/>
+            <db:parameterized-query><![CDATA[USE [OpenDataHub]
+GO
+
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[property_sales_s]
+		@latitude = NULL,
+		@longitude = NULL,
+		@radius_in_meters = 50000,
+		@start_date = '2014-01-01',
+		@end_date = '2017-04-12',
+		@min_price = 100000,
+		@max_price = 100000000
+
+SELECT	'Return Value' = @return_value
+
+GO]]></db:parameterized-query>
         </db:stored-procedure>
+        <dw:transform-message doc:name="Build Response">
+            <dw:set-payload resource="classpath:BuildOdataResponse.dwl"/>
+        </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
     </flow>
     <flow name="get:/valuations:api-config">
         <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
