@@ -1,33 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
-    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8082" doc:name="HTTP Listener Configuration"/>
-    <flow name="implementationFlow">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/testStoreProc" allowedMethods="GET" doc:name="HTTP"/>
-        <db:stored-procedure config-ref="Generic_Database_Configuration" doc:name="Copy_of_Database">
-            <db:parameterized-query><![CDATA[USE [OpenDataHub]
-GO
-
-DECLARE	@return_value int
-
-EXEC	@return_value = [dbo].[property_sales_s]
-		@latitude = NULL,
-		@longitude = NULL,
-		@radius_in_meters = 50000,
-		@start_date = '2014-01-01',
-		@end_date = '2017-04-12',
-		@min_price = 100000,
-		@max_price = 100000000
-
-SELECT	'Return Value' = @return_value
-
-GO]]></db:parameterized-query>
-        </db:stored-procedure>
-    </flow>
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<flow name="implementationFlow">
+        <vm:inbound-endpoint exchange-pattern="request-response" path="valuationReq" connector-ref="VM" doc:name="VM"/>
+        <logger message="XXXXXXXXXXXXXXXXXXXXXXXXXX VM Flow Triggered " level="INFO" doc:name="Logger"/>
+		<db:stored-procedure config-ref="SQLServer_Database_Configuration" doc:name="Copy_of_Database">
+            <db:parameterized-query><![CDATA[{call property_sales_s (:latitude, :longitude, :radius_in_meters, :start_date, :end_date, :min_price, :max_price )}]]></db:parameterized-query>
+            <db:in-param name="latitude" value="5184142.08748715"/>
+            <db:in-param name="longitude" value="1572205.34594268"/>
+            <db:in-param name="radius_in_meters" value="500"/>
+            <db:in-param name="start_date" value="2014-01-01"/>
+            <db:in-param name="end_date" value="2017-04-12"/>
+            <db:in-param name="min_price" value="100000"/>
+            <db:in-param name="max_price" value="100000000"/>
+		</db:stored-procedure>
+        <logger message="XXXXXXXXXXXXX Payload of VM: #[payload]" level="INFO" doc:name="Logger"/>
+	</flow>
 </mule>
